@@ -6,7 +6,8 @@ from dataclasses import dataclass
 class Move:
     x: int
     y: int
-    is_capture: bool
+    is_capture: bool = False
+    is_castle: bool = False
 
     def __eq__(self, other):
         if isinstance(other, Move):
@@ -22,6 +23,16 @@ class Model:
         self.kings = {Color.WHITE: (7, 4), Color.BLACK: (0, 4)}
         self.checks = {}
         self.pins = {}
+        self.castle_moves = {
+            Color.WHITE: {
+                (7, 0): Move(7, 2, False, True),
+                (7, 7): Move(7, 6, False, True),
+            },
+            Color.BLACK: {
+                (0, 0): Move(0, 2, False, True),
+                (0, 7): Move(0, 6, False, True),
+            },
+        }
         self.moves = self.get_moves()
         self.winner = None
 
@@ -212,7 +223,9 @@ class Model:
 
     def get_king_moves(self, i_0, j_0):
         moves = self.get_single_moves(i_0, j_0, self.king_dirs())
-        return [move for move in moves if self.safe_king_square(move.x, move.y)]
+        return [move for move in moves if self.safe_king_square(move.x, move.y)] + [
+            move for move in self.valid_castle_moves()
+        ]
 
     def get_queen_moves(self, i_0, j_0):
         directions = self.diagonal_dirs() + self.straight_dirs()
@@ -256,13 +269,33 @@ class Model:
             if m == move:
                 actual_move = m
                 break
+        if piece.piece_type == PieceType.ROOK and not piece.has_moved:
+            del self.castle_moves[self.turn][i_0, j_0]
         if piece.piece_type == PieceType.KING:
+            if actual_move.is_castle:
+                posns = [
+                    posn
+                    for posn, mv in self.castle_moves[self.turn].items()
+                    if mv.x == actual_move.x and mv.y == actual_move.y
+                ]
+                rook_x, rook_y = posns[0]
+                x, y = (0, int((actual_move.y - rook_y) / abs(rook_y - actual_move.y)))
+                new_rook_pos = (actual_move.x + x, actual_move.y + y)
+                self.board[rook_x, rook_y] = None
+                print(f"new rook pos: {new_rook_pos}")
+                self.board[new_rook_pos] = Piece(
+                    PieceType.ROOK, self.turn, has_moved=True
+                )
+            if self.turn in self.castle_moves:
+                del self.castle_moves[self.turn]
             self.kings[piece.color] = (move.x, move.y)
+
         piece.has_moved = True
         if piece.piece_type == PieceType.PAWN and move.x == self.get_promotion_x(
             piece.color
         ):
             self.board[move.x, move.y] = Piece(PieceType.QUEEN, piece.color)
+            return "promotion"
         else:
             self.board[move.x, move.y] = piece
         self.board[i_0, j_0] = None
@@ -357,3 +390,39 @@ class Model:
 
     def is_game_over(self):
         return self.winner is not None
+
+    def valid_castle_moves(self):
+        if self.turn not in self.castle_moves:
+            return []
+        castle_moves = self.castle_moves[self.turn]
+        king_position = self.kings[self.turn]
+        moves = []
+        for rook_position, king_move in castle_moves.items():
+            if (
+                self.board[rook_position]
+                and not self.board[rook_position].has_moved
+                and not self.board[king_position].has_moved
+            ):
+                _, y = rook_position
+                _, j = king_position
+                x, z = (0, int((j - y) / abs(y - j)))
+                print("\n\n")
+                print(x, z)
+                a, b = rook_position
+                a += x
+                b += z
+                valid = True
+                while (a, b) != king_position:
+                    print(self.board[a, b])
+                    if self.board[a, b]:
+                        valid = False
+                        break
+                    if self.get_checks(a, b):
+                        valid = False
+                        break
+                    a += x
+                    b += z
+                if valid:
+                    moves.append(king_move)
+        print(f"moves is {moves}")
+        return moves

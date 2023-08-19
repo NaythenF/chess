@@ -45,16 +45,22 @@ class Board:
             self.squares[6][i] = Piece(PieceType.PAWN, Color.WHITE)
 
         # Rooks
-        self.squares[0][0] = self.squares[0][7] = Piece(PieceType.ROOK, Color.BLACK)
-        self.squares[7][0] = self.squares[7][7] = Piece(PieceType.ROOK, Color.WHITE)
+        self.squares[0][0] = Piece(PieceType.ROOK, Color.BLACK)
+        self.squares[0][7] = Piece(PieceType.ROOK, Color.BLACK)
+        self.squares[7][0] = Piece(PieceType.ROOK, Color.WHITE)
+        self.squares[7][7] = Piece(PieceType.ROOK, Color.WHITE)
 
         # Knights
-        self.squares[0][1] = self.squares[0][6] = Piece(PieceType.KNIGHT, Color.BLACK)
-        self.squares[7][1] = self.squares[7][6] = Piece(PieceType.KNIGHT, Color.WHITE)
+        self.squares[0][1] = Piece(PieceType.KNIGHT, Color.BLACK)
+        self.squares[0][6] = Piece(PieceType.KNIGHT, Color.BLACK)
+        self.squares[7][1] = Piece(PieceType.KNIGHT, Color.WHITE)
+        self.squares[7][6] = Piece(PieceType.KNIGHT, Color.WHITE)
 
         # Bishops
-        self.squares[0][2] = self.squares[0][5] = Piece(PieceType.BISHOP, Color.BLACK)
-        self.squares[7][2] = self.squares[7][5] = Piece(PieceType.BISHOP, Color.WHITE)
+        self.squares[0][2] = Piece(PieceType.BISHOP, Color.BLACK)
+        self.squares[0][5] = Piece(PieceType.BISHOP, Color.BLACK)
+        self.squares[7][2] = Piece(PieceType.BISHOP, Color.WHITE)
+        self.squares[7][5] = Piece(PieceType.BISHOP, Color.WHITE)
 
         # Kings
         self.squares[0][4] = Piece(PieceType.KING, Color.BLACK)

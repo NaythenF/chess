@@ -45,6 +45,7 @@ sounds = {
     "capture": pygame.mixer.Sound(f"{directory}\\assets\\capture.mp3"),
     "check": pygame.mixer.Sound(f"{directory}\\assets\\check.mp3"),
     "end": pygame.mixer.Sound(f"{directory}\\assets\\end.mp3"),
+    "castle": pygame.mixer.Sound(f"{directory}\\assets\\castle.mp3"),
 }
 while running:
     # poll for events
@@ -79,6 +80,9 @@ while running:
                         pygame.mixer.music.stop()
                     elif move_played.is_capture:
                         pygame.mixer.Sound.play(sounds["capture"])
+                        pygame.mixer.music.stop()
+                    elif move_played.is_castle:
+                        pygame.mixer.Sound.play(sounds["castle"])
                         pygame.mixer.music.stop()
                     else:
                         pygame.mixer.Sound.play(sounds["move"])
