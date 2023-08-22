@@ -269,8 +269,6 @@ class Model:
             if m == move:
                 actual_move = m
                 break
-        if piece.piece_type == PieceType.ROOK and not piece.has_moved:
-            del self.castle_moves[self.turn][i_0, j_0]
         if piece.piece_type == PieceType.KING:
             if actual_move.is_castle:
                 posns = [
