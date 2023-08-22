@@ -223,9 +223,9 @@ class Model:
 
     def get_king_moves(self, i_0, j_0):
         moves = self.get_single_moves(i_0, j_0, self.king_dirs())
-        return [move for move in moves if self.safe_king_square(move.x, move.y)] + [
-            move for move in self.valid_castle_moves()
-        ]
+        if not self.checks:
+            moves += [move for move in self.valid_castle_moves()]
+        return [move for move in moves if self.safe_king_square(move.x, move.y)]
 
     def get_queen_moves(self, i_0, j_0):
         directions = self.diagonal_dirs() + self.straight_dirs()
@@ -330,7 +330,8 @@ class Model:
                 continue
             while self.valid_position(i, j):
                 piece = self.board[i, j]
-                if piece:
+
+                if piece and piece != Piece(PieceType.KING, self.turn):
                     if (x, y) in self.get_piece_directions(
                         piece.piece_type
                     ) and piece.color == other:
